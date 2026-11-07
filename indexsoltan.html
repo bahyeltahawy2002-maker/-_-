@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر السلطان | للمعسل والدخان والفيب</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207'
+                        },
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/20 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-400 flex items-center justify-center text-slate-950 font-bold text-xl shadow-md shadow-amber-500/20">
+                    👑
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+                        السلطان
+                    </h1>
+                    <p class="text-xs text-amber-200/60">للدخان والمعسل ومستلزمات الفيب</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center gap-3">
+                <!-- Cart Button (Customer View) -->
+                <button id="cart-toggle-btn" onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-slate-800 text-amber-400 hover:bg-slate-700 transition flex items-center gap-2 border border-amber-500/30">
+                    <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    <span class="hidden sm:inline text-sm font-semibold">السلة</span>
+                    <span id="cart-count-badge" class="absolute -top-1.5 -right-1.5 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-full w-5 h-5 flex items-center justify-center hidden shadow-md">0</span>
+                </button>
+
+                <!-- Toggle View Button (Customer / Admin) -->
+                <button id="mode-toggle-btn" onclick="switchMode()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-bold text-xs sm:text-sm shadow-md hover:brightness-110 transition flex items-center gap-2">
+                    <i id="mode-icon" class="fa-solid fa-user-gear"></i>
+                    <span id="mode-text">دخول الإدارة</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+
+        <!-- ================= CUSTOMER VIEW ================= -->
+        <section id="customer-view" class="space-y-6">
+            <!-- Banner / Announcement -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-amber-950/40 to-slate-900 border border-amber-500/30 p-6 shadow-xl">
+                <div class="relative z-10 max-w-xl">
+                    <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-500/30">خدمة توصيل فورية 🚀</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3 mb-2">أهلاً بكم في متجر السلطان</h2>
+                    <p class="text-slate-300 text-sm sm:text-base mb-4">اطلب جميع احتياجاتك من أجود أنواع المعسل، السجائر، الفيب والملحقات، والطلب هيوصلك لحد باب البيت عبر الواتساب فوراً.</p>
+                    <div class="flex flex-wrap gap-3 text-xs text-amber-400 font-mono">
+                        <span class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700"><i class="fa-solid fa-phone ml-1"></i> 01018104482</span>
+                        <span class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700"><i class="fa-solid fa-phone ml-1"></i> 01020595089</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-96">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-input" oninput="renderCustomerProducts()" placeholder="ابحث عن اسم المنتج..." class="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500 text-sm transition">
+                </div>
+
+                <!-- Category Filters -->
+                <div id="category-buttons" class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                    <!-- Categories dynamically generated here -->
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="customer-products-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                <!-- Products loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- ================= ADMIN VIEW (Protected) ================= -->
+        <section id="admin-view" class="hidden space-y-6">
+            <div class="flex items-center justify-between bg-slate-900 p-4 rounded-2xl border border-amber-500/30">
+                <div>
+                    <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield"></i> لوحة تحكم إدارة المتجر
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">أنت الآن في وضع المسؤول. يمكنك إضافة أو تعديل أو حذف المنتجات.</p>
+                </div>
+                <button onclick="logoutAdmin()" class="px-3 py-1.5 rounded-lg bg-red-950 text-red-400 border border-red-800/50 hover:bg-red-900 text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+                </button>
+            </div>
+
+            <!-- Control Actions & Add Form Toggle -->
+            <div class="flex flex-wrap gap-3">
+                <button onclick="openProductModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> إضافة منتج جديد
+                </button>
+                <button onclick="openChangePasswordModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold text-sm border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-key"></i> تغيير كلمة السر
+                </button>
+            </div>
+
+            <!-- Admin Product Table -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm text-slate-300">
+                        <thead class="bg-slate-800/80 text-amber-400 text-xs uppercase font-bold border-b border-slate-700">
+                            <tr>
+                                <th class="px-4 py-3.5">المنتج</th>
+                                <th class="px-4 py-3.5">القسم</th>
+                                <th class="px-4 py-3.5">السعر</th>
+                                <th class="px-4 py-3.5">الحالة</th>
+                                <th class="px-4 py-3.5 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-product-table" class="divide-y divide-slate-800">
+                            <!-- Admin Table rows generated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>جميع الحقوق محفوظة © متجر السلطان 2026 - للتواصل والطلبات: 01018104482 / 01020595089</p>
+    </footer>
+
+    <!-- ================= MODALS & DRAWERS ================= -->
+
+    <!-- Shopping Cart Drawer -->
+    <div id="cart-drawer-backdrop" onclick="toggleCartDrawer()" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+    <div id="cart-drawer" class="fixed top-0 left-0 bottom-0 w-full sm:w-96 bg-slate-900 z-50 shadow-2xl border-r border-slate-800 flex flex-col transform -translate-x-full transition-transform duration-300">
+        <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping"></i> سلة الشراء
+            </h3>
+            <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-white p-1 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Cart Items Dynamic -->
+        </div>
+
+        <div class="p-4 bg-slate-800/90 border-t border-slate-700 space-y-3">
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-slate-400">إجمالي المشتريات:</span>
+                <span id="cart-total-price" class="text-xl font-extrabold text-amber-400">0 ج.م</span>
+            </div>
+
+            <p class="text-xs text-slate-400">اختر الرقم الذي ترغب في تحويل الطلب إليه عبر الواتساب:</p>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="checkoutWhatsApp('01018104482')" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> 01018104482
+                </button>
+                <button onclick="checkoutWhatsApp('01020595089')" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> 01020595089
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mx-auto mb-2 border border-amber-500/30">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">دخول لوحة الإدارة</h3>
+                <p class="text-xs text-slate-400 mt-1">أدخل كلمة المرور الخاصة بالمسؤول</p>
+            </div>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">كلمة السر</label>
+                    <input type="password" id="admin-pass-input" placeholder="أدخل كلمة السر..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+                <div id="login-error-msg" class="text-red-400 text-xs hidden font-medium text-center">كلمة السر غير صحيحة!</div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-bold text-sm hover:brightness-110 transition">
+                    تسجيل الدخول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl relative max-h-[95vh] overflow-y-auto">
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="product-modal-title" class="text-lg font-bold text-amber-400 mb-4">إضافة منتج جديد</h3>
+
+            <form onsubmit="saveProduct(event)" class="space-y-4">
+                <input type="hidden" id="prod-id">
+
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">اسم المنتج</label>
+                    <input type="text" id="prod-name" required placeholder="مثال: معسل فاخر 250 جرام" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 font-semibold mb-1">السعر (ج.م)</label>
+                        <input type="number" id="prod-price" required min="0" placeholder="0" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 font-semibold mb-1">القسم</label>
+                        <select id="prod-category" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                            <option value="معسل">معسل</option>
+                            <option value="سجائر">سجائر</option>
+                            <option value="فيب">فيب</option>
+                            <option value="مستلزمات">مستلزمات</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">رمز تعبيري (أيقونة) أو رابط صورة</label>
+                    <input type="text" id="prod-image" placeholder="مثال: 🍃 أو رابط صورة" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">حالة التوفر</label>
+                    <select id="prod-in-stock" class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                        <option value="true">متوفر بالمخزن</option>
+                        <option value="false">غير متوفر حالياً</option>
+                    </select>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="submit" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition">
+                        حفظ المنتج
+                    </button>
+                    <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-sm hover:bg-slate-700 transition">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="password-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
+            <button onclick="closePasswordModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-lg font-bold text-amber-400 mb-4">تغيير كلمة سر الإدارة</h3>
+            <form onsubmit="saveNewPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">كلمة السر الجديدة</label>
+                    <input type="password" id="new-pass-input" required placeholder="أدخل كلمة السر الجديدة..." class="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition">
+                    حفظ كلمة السر
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // Initial Default Products Data
+        const defaultProducts = [
+            { id: 1, name: 'معسل فاخر تفاحتين 250 جرام', category: 'معسل', price: 150, image: '🍏', inStock: true },
+            { id: 2, name: 'معسل فواكه مشكلة 100 جرام', category: 'معسل', price: 70, image: '🍇', inStock: true },
+            { id: 3, name: 'سجائر مالبورو أحمر', category: 'سجائر', price: 95, image: '🚬', inStock: true },
+            { id: 4, name: 'سجائر إل إم أزرق', category: 'سجائر', price: 75, image: '🚬', inStock: true },
+            { id: 5, name: 'فيب سحب جاهز 5000 مسمار', category: 'فيب', price: 450, image: '💨', inStock: true },
+            { id: 6, name: 'نكهة سولت نكوتين مانجو 30 مل', category: 'فيب', price: 280, image: '🥭', inStock: true },
+            { id: 7, name: 'فحم شرار سريع الاشتعال', category: 'مستلزمات', price: 45, image: '🔥', inStock: true },
+            { id: 8, name: 'مبسم معقم 50 قطعة', category: 'مستلزمات', price: 30, image: '✨', inStock: true }
+        ];
+
+        // Global State
+        let products = JSON.parse(localStorage.getItem('sultan_products')) || defaultProducts;
+        let adminPassword = localStorage.getItem('sultan_admin_pass') || '123';
+        let cart = [];
+        let activeCategory = 'الكل';
+        let isAdminLoggedIn = false;
+
+        // Save State to LocalStorage
+        function saveToStorage() {
+            localStorage.setItem('sultan_products', JSON.stringify(products));
+        }
+
+        // App Initialization
+        window.onload = function() {
+            renderCategories();
+            renderCustomerProducts();
+        };
+
+        // Render Category Filter Buttons
+        function renderCategories() {
+            const categories = ['الكل', 'معسل', 'سجائر', 'فيب', 'مستلزمات'];
+            const container = document.getElementById('category-buttons');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition border ${activeCategory === cat ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20' : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            renderCategories();
+            renderCustomerProducts();
+        }
+
+        // Render Customer Store Products
+        function renderCustomerProducts() {
+            const grid = document.getElementById('customer-products-grid');
+            const searchVal = document.getElementById('search-input').value.trim().toLowerCase();
+
+            const filtered = products.filter(p => {
+                const matchesCat = activeCategory === 'الكل' || p.category === activeCategory;
+                const matchesSearch = p.name.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-box-open text-4xl mb-3 text-slate-600"></i>
+                        <p class="text-sm">لا توجد منتجات مطابقة للبحث حالياً</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(product => {
+                const isEmoji = !product.image.startsWith('http');
+                return `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500/40 transition group shadow-md">
+                        <div>
+                            <div class="h-32 rounded-xl bg-slate-950/80 flex items-center justify-center overflow-hidden mb-3 border border-slate-800 group-hover:scale-105 transition duration-300">
+                                ${isEmoji ? `<span class="text-5xl">${product.image || '📦'}</span>` : `<img src="${product.image}" class="w-full h-full object-cover" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/200x200/1e293b/eab308?text=السلطان'">`}
+                            </div>
+                            <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${product.category}</span>
+                            <h3 class="text-sm font-bold text-slate-100 mt-1 line-clamp-2">${product.name}</h3>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 block">السعر</span>
+                                <span class="text-base font-extrabold text-amber-400">${product.price} <span class="text-xs font-normal">ج.م</span></span>
+                            </div>
+                            ${product.inStock 
+                                ? `<button onclick="addToCart(${product.id})" class="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center hover:bg-amber-400 transition shadow-md shadow-amber-500/20">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                   </button>`
+                                : `<span class="text-[10px] bg-red-950 text-red-400 border border-red-800/50 px-2 py-1 rounded">غير متوفر</span>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Cart Drawer Operations
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            const backdrop = document.getElementById('cart-drawer-backdrop');
+            const isOpen = !drawer.classList.contains('-translate-x-full');
+
+            if (isOpen) {
+                drawer.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            } else {
+                drawer.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                renderCart();
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            updateCartBadge();
+            toggleCartDrawer();
+        }
+
+        function updateCartQty(productId, change) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            item.qty += change;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            updateCartBadge();
+            renderCart();
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-count-badge');
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-items-list');
+            const totalPriceEl = document.getElementById('cart-total-price');
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-2 text-slate-600"></i>
+                        <p class="text-sm">السلة فارغة حالياً</p>
+                    </div>
+                `;
+                totalPriceEl.innerText = '0 ج.م';
+                return;
+            }
+
+            let total = 0;
+            list.innerHTML = cart.map(item => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                return `
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${item.image.startsWith('http') ? '📦' : item.image}</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.name}</h4>
+                                <span class="text-xs text-amber-400 font-bold">${item.price} ج.م</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs hover:bg-slate-700">-</button>
+                            <span class="text-xs font-bold text-white px-1">${item.qty}</span>
+                            <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs hover:bg-slate-700">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalPriceEl.innerText = total + ' ج.م';
+        }
+
+        // WhatsApp Checkout
+        function checkoutWhatsApp(phone) {
+            if (cart.length === 0) {
+                alert('السلة فارغة! قم بإضافة منتجات أولاً.');
+                return;
+            }
+
+            let message = `*طلب جديد من متجر السلطان 👑*\n\n`;
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                message += `${index + 1}. *${item.name}*\n   العدد: ${item.qty} × ${item.price} ج.م = ${itemTotal} ج.م\n`;
+            });
+
+            message += `\n*الإجمالي الكلي:* ${total} ج.م\n`;
+            message += `-------------------------\nبرجاء تأكيد الطلب والتوصيل.`;
+
+            const encodedMsg = encodeURIComponent(message);
+            window.open(`https://wa.me/20${phone}?text=${encodedMsg}`, '_blank');
+        }
+
+        // Switch Mode (Customer vs Admin Login)
+        function switchMode() {
+            if (isAdminLoggedIn) {
+                toggleView(true);
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-error-msg').classList.add('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === adminPassword) {
+                isAdminLoggedIn = true;
+                closeLoginModal();
+                toggleView(true);
+                document.getElementById('admin-pass-input').value = '';
+            } else {
+                document.getElementById('login-error-msg').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            toggleView(false);
+        }
+
+        function toggleView(showAdmin) {
+            const customerView = document.getElementById('customer-view');
+            const adminView = document.getElementById('admin-view');
+            const modeBtnText = document.getElementById('mode-text');
+            const modeIcon = document.getElementById('mode-icon');
+
+            if (showAdmin) {
+                customerView.classList.add('hidden');
+                adminView.classList.remove('hidden');
+                modeBtnText.innerText = 'عرض كزبون';
+                modeIcon.className = 'fa-solid fa-store';
+                renderAdminTable();
+            } else {
+                adminView.classList.add('hidden');
+                customerView.classList.remove('hidden');
+                modeBtnText.innerText = 'دخول الإدارة';
+                modeIcon.className = 'fa-solid fa-user-gear';
+                renderCustomerProducts();
+            }
+        }
+
+        // Admin Operations: Render Table
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-product-table');
+            tbody.innerHTML = products.map(p => `
+                <tr class="hover:bg-slate-800/50 transition">
+                    <td class="px-4 py-3 flex items-center gap-2 font-semibold text-slate-100">
+                        <span class="text-xl">${p.image.startsWith('http') ? '📦' : p.image}</span>
+                        ${p.name}
+                    </td>
+                    <td class="px-4 py-3 text-amber-400 font-medium">${p.category}</td>
+                    <td class="px-4 py-3 font-bold">${p.price} ج.م</td>
+                    <td class="px-4 py-3">
+                        ${p.inStock 
+                            ? `<span class="bg-emerald-950 text-emerald-400 border border-emerald-800/50 text-[11px] px-2 py-0.5 rounded">متوفر</span>`
+                            : `<span class="bg-red-950 text-red-400 border border-red-800/50 text-[11px] px-2 py-0.5 rounded">غير متوفر</span>`
+                        }
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="editProduct(${p.id})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 transition">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteProduct(${p.id})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-red-600 hover:text-white text-red-400 transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Product Modal (Add/Edit)
+        function openProductModal() {
+            document.getElementById('product-modal-title').innerText = 'إضافة منتج جديد';
+            document.getElementById('prod-id').value = '';
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('prod-category').value = 'معسل';
+            document.getElementById('prod-image').value = '';
+            document.getElementById('prod-in-stock').value = 'true';
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            document.getElementById('product-modal-title').innerText = 'تعديل المنتج';
+            document.getElementById('prod-id').value = p.id;
+            document.getElementById('prod-name').value = p.name;
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-category').value = p.category;
+            document.getElementById('prod-image').value = p.image;
+            document.getElementById('prod-in-stock').value = p.inStock ? 'true' : 'false';
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const name = document.getElementById('prod-name').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const category = document.getElementById('prod-category').value;
+            const image = document.getElementById('prod-image').value || '🚬';
+            const inStock = document.getElementById('prod-in-stock').value === 'true';
+
+            if (id) {
+                // Update
+                const index = products.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    products[index] = { id: parseInt(id), name, price, category, image, inStock };
+                }
+            } else {
+                // Add New
+                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.push({ id: newId, name, price, category, image, inStock });
+            }
+
+            saveToStorage();
+            closeProductModal();
+            renderAdminTable();
+        }
+
+        function deleteProduct(id) {
+            if (confirm('هل أنت تأكد من رغبتك في حذف هذا المنتج؟')) {
+                products = products.filter(p => p.id !== id);
+                saveToStorage();
+                renderAdminTable();
+            }
+        }
+
+        // Change Password Modal
+        function openChangePasswordModal() {
+            document.getElementById('password-modal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+        }
+
+        function saveNewPassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('new-pass-input').value;
+            if (newPass) {
+                adminPassword = newPass;
+                localStorage.setItem('sultan_admin_pass', newPass);
+                alert('تم تغيير كلمة سر الإدارة بنجاح!');
+                closePasswordModal();
+            }
+        }
+    </script>
+</body>
+</html>
